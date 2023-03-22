@@ -1,131 +1,117 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { v4 as uuidv4 } from 'uuid';
-import { useState, useEffect } from 'react';
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Radar } from 'react-chartjs-2';
-
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-);
-
-
-
-const defaultData= {
-  
-  labels: ['HP', 'Attack', 'Defense', 'Special Attack', 'Special Defense', 'Speed'],
-  datasets: [
-    {
-      label: 'Stat Distribution',
-      data: [45, 49, 49, 65, 65, 45],
-      backgroundColor: 'rgba(100, 99, 132, 0.2)',
-      borderColor: 'rgba(255, 99, 132, 1)',
-      borderWidth: 1,
-    },
-  ],
-  
-  
-};
-
-
-
+import '../styles/PokemonCard.css';
+import { useState, useEffect, useContext } from 'react';
+import{Card,Avatar,IconButton, CardHeader, CardActions, CardContent, CardMedia, Button, Typography} from '@mui/material';
+import MediaCard from './CustomCards';
+import { NavBar } from './UI/NavBar';
 
 function PokemonCard() {
-  
-
   const pokeApiDomain = `https://pokeapi.co/api/v2/pokemon/`;
   const [currentId, setCurrentId] = useState(1);
-  const [pokemon, setPokemon] = useState({ sprites: {}, weight: 0, abilities: [], types: [], stats: [{hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0}]});
-  const [loading, setLoading] = useState(false);
-  const [weaknesses, setWeaknesses] = useState([]);
-  const [stats,setStats] = useState([]);
-  
-  useEffect(() => {
-    fetch(`${pokeApiDomain}${currentId}`)
-    .then(response => response.json())
-    .then((data)=>{
-      setCurrentId(data.id);
-      setPokemon(data);
-      const typeUrls = data.types.map(type => type.type.url);
-      typeUrls.map((url) => fetch(url)
-      .then((response)=>response.json())
-      .then((response)=> setWeaknesses(response.damage_relations.double_damage_from)))
-      .then((response)=> setStats(response.stats));
-      setLoading(false)
+  const [pokemon, setPokemon] = useState({sprites:{other:{"official-artwork":{}}}, weight:0, abilities:[]});
+  const [isLoading, setIsLoading] = useState(false);
+  const [weaknes, setweaknes] = useState([]);
+  const [statsInfo, setStatsInfo] = useState([]);
 
-    })
-    .catch((err)=>
-    console.log(err))
-  }, [currentId]);
 
   const getPokemon = (id) => {
-    if(id > 0 && id < 152){
-      setCurrentId(id);
-    }
-    else if( id === 0){
-      setCurrentId(151);
-      
-    }
-    else if(id===152){
-      setCurrentId(1);
-      
-    }
+    id= id > 150 ? 1 : id < 1 ? 150 : id;
+    setCurrentId(id);
+  };
+
+  async function setPokemonDamage1 (info) {
+    setweaknes([]);
+    let typeUrls= info.types.map(item =>item.type.url);
+    let results = [];
     
-      
+    await Promise.all(typeUrls.map(async (typeUrl) => {
+      await fetch(typeUrl)
+      .then(response => response.json())
+      .then(data => {
+        let damageFromDouble = data.damage_relations.double_damage_from
+                              .map(x=>x.name);
+        results.push(damageFromDouble);
+      })
+    }));
+
+    results.forEach(element => {
+      element.forEach(newType => {
+        weaknes.push(newType);
+      });
+    });
+
+    setweaknes([...new Set(weaknes)]);
     
+    return weaknes;
   }
 
-  return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardMedia
-        component="img"
-        alt="pokemon"
-        height="300"
-        
-        image={pokemon.sprites.front_default}
-      />
-      <CardContent>
-        <Typography className = "pokemon-name" gutterBottom variant="h5" component="div">
-          {pokemon.name}
-        </Typography>
-        <Typography className = "pokemon-types" variant="body2" color="text.secondary">
-        Types: {pokemon.types.map((type) => type.type.name).join(', ')}
-        
-        </Typography>
-        <Typography className = "pokemon-weaknesses" variant="body2" color="text.secondary">
-        weaknesses: {weaknesses.map((weakness) => weakness.name).join(', ')}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="medium" className="arrow-button left" onClick={() => getPokemon(currentId - 1)}> - </Button>
-        <Button size="medium" className="arrow-button right" onClick={() => getPokemon(currentId + 1)}> + </Button>
-      </CardActions>
-      <Typography className = "pokemon-stats" variant="body2" color="text.secondary">
-        Stats: {pokemon.stats.map((stat)=> stat.stat.name + ": " + stat.base_stat).join(', ')}
-        </Typography>
-      <Radar data={defaultData}/>
-     
-      
-    </Card>
+  const getPokemonDamage = (info) => {
+    return setPokemonDamage1(info);
+  }
+  
+  const setStatsInformation = (pokemonInfo1)=>{
+    let label1 = [];
+    let stats1 = [];
+
+    console.log(pokemonInfo1);
+    pokemonInfo1.stats.forEach(element => {
+      label1.push(element.stat.name);
+      stats1.push(element.base_stat);
+    });
     
+    setStatsInfo({labels: label1, stats: stats1});
+  }
+
+  useEffect(() => {
+    setIsLoading(true);
+    getPokemon(currentId);
+    fetch(`${pokeApiDomain}${currentId}`)
+      .then(response => response.json())
+      .then(pokemonData => {
+        setCurrentId(pokemonData.id);
+        setPokemon(pokemonData);
+        getPokemonDamage(pokemonData);
+        setStatsInformation(pokemonData);
+        setIsLoading(false);
+      })
+      .catch(err => console.error(err));
+  }, [currentId]);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+      <NavBar>hola </NavBar>
+        {
+          isLoading ? (
+            <>
+              <h1>Loading.....</h1>
+            </>
+          ) : (
+          <div>
+              {/* Head container */ }
+            <div style=
+              {{
+                borderRadius:'5px',
+                boxShadow: '0 0 0 .4em yellow',
+                display: 'flex',
+                flexDirection:'row',
+                zIndex:100
+
+              }}>
+              <div style= {{marginRight:'-23px', zIndex:1, display:'flex', alignItems:'center'}}>
+                <button onClick = {()=> getPokemon(currentId-1)}>{'<'}</button>
+              </div>
+              <div>
+                <MediaCard  pokemonInfo= {pokemon} weaknessess={weaknes} statsInfo={statsInfo}/>
+              </div>
+              <div style={{marginLeft:'-23px', zIndex:1, display:'flex', alignItems:'center'}}>
+                <button onClick={()=> getPokemon(currentId + 1)}>{'>'}</button>
+              </div>        
+            </div> 
+          </div>
+          )
+        }
+      </header >
+    </div >
   );
 }
 
