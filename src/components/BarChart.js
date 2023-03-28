@@ -11,9 +11,9 @@ export const BarChart = ({inputData}) => {
         label: 'Stats',
         data: inputData.stats,
         backgroundColor: [
-            'rgba(255, 99, 132)',
-            'rgba(255, 159, 64)',
-            'rgba(255, 205, 86)',
+            'rgba(106, 168, 79)',
+            'rgba(106, 159, 64)',
+            'rgba(106, 205, 86)',
             'rgba(75, 192, 192)',
             'rgba(54, 162, 235)',
             'rgba(153, 102, 255)',
@@ -25,7 +25,7 @@ export const BarChart = ({inputData}) => {
       
     return (
         <div className="chart-container">
-            <h3 style ={{textAlign: 'center'}}> Pokemon Stats </h3>
+            <h3 style ={{textAlign: 'center'}}> - Stats </h3>
             <div backgroundColor="black">
                 <Bar
                     data={data}

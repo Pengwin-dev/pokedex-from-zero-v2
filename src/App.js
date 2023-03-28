@@ -9,16 +9,15 @@ function App() {
   return (
     <div className="App">
       
-        <main>
          {/* <ThemeProvider>  */}
-          <Routes>
+           <Routes>
             <Route path='/' element= {<SignInComponent/>}></Route>
             <Route path='/home' element={<PokemonCard/>}></Route>
-            <Route path='*' element={<PageNotFoundComponent/>}></Route>
+          {/* <Route path='*' element={<PageNotFoundComponent/>}></Route> */}
 
           </Routes>
          {/* </ThemeProvider>  */}
-        </main>
+       
       
       </div>
   );

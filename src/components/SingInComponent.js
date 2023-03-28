@@ -1,10 +1,8 @@
-import { useContext } from "react";
-import { useState, useEffect } from "react";
+
+import { useContext,useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ThemeContext from "./context/ThemeContext";
-import {NavBar} from "./UI/NavBar";
 import DrawerAppBar from "./UI/DrawerAppBar";
-
 import Switch from '@mui/material/Switch';
 
 
@@ -16,7 +14,7 @@ function SignInComponent(props) {
     const [emailErrorS, setEmailError] = useState("");
     const [passwordErrorS, setPasswordError] = useState("");
 
-    // const activeStyle = {color: "#F15B2A" };
+
     const data = useContext(ThemeContext);
     const navigate = useNavigate();
 

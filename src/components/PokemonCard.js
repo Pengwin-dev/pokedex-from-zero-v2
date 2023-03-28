@@ -1,7 +1,9 @@
 import '../styles/PokemonCard.css';
-import { useState, useEffect, useContext } from 'react';
-import{Card,Avatar,IconButton, CardHeader, CardActions, CardContent, CardMedia, Button, Typography} from '@mui/material';
-import MediaCard from './CustomCards';
+import { useState, useEffect } from 'react';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
 import { NavBar } from './UI/NavBar';
 
 function PokemonCard() {
@@ -9,7 +11,7 @@ function PokemonCard() {
   const [currentId, setCurrentId] = useState(1);
   const [pokemon, setPokemon] = useState({sprites:{other:{"official-artwork":{}}}, weight:0, abilities:[]});
   const [isLoading, setIsLoading] = useState(false);
-  const [weaknes, setweaknes] = useState([]);
+  const [weaknes, setWeaknesses] = useState([]);
   const [statsInfo, setStatsInfo] = useState([]);
 
 
@@ -19,7 +21,7 @@ function PokemonCard() {
   };
 
   async function setPokemonDamage1 (info) {
-    setweaknes([]);
+    setWeaknesses([]);
     let typeUrls= info.types.map(item =>item.type.url);
     let results = [];
     
@@ -39,7 +41,7 @@ function PokemonCard() {
       });
     });
 
-    setweaknes([...new Set(weaknes)]);
+    setWeaknesses([...new Set(weaknes)]);
     
     return weaknes;
   }
@@ -79,7 +81,7 @@ function PokemonCard() {
   return (
     <div className="App">
       <header className="App-header">
-      <NavBar>hola </NavBar>
+      <NavBar>POKEMONCARD </NavBar>
         {
           isLoading ? (
             <>
@@ -87,7 +89,7 @@ function PokemonCard() {
             </>
           ) : (
           <div>
-              {/* Head container */ }
+             
             <div style=
               {{
                 borderRadius:'5px',
@@ -101,7 +103,38 @@ function PokemonCard() {
                 <button onClick = {()=> getPokemon(currentId-1)}>{'<'}</button>
               </div>
               <div>
-                <MediaCard  pokemonInfo= {pokemon} weaknessess={weaknes} statsInfo={statsInfo}/>
+              <div className='Pokedex-Frame'>
+            <div>
+              <label className="Pokemon-Name">{pokemon.name.toUpperCase()}</label>
+            </div>
+            <div>
+              <img src={pokemon.sprites.front_default} className="Pokemon-Sprite" alt="logo" />
+            </div>
+            <div>
+              <button className="arrow-button left" onClick={() => getPokemon(currentId - 1)}></button>
+              <button className="arrow-button right" onClick={() => getPokemon(currentId + 1)}></button>
+            </div>
+            <div className="Pokemon-Weight">
+              <label className="Pokemon-Weight-Title">Weight: </label>
+              {
+                <div key={uuidv4()}>
+                  <label className="Pokemon-Weight-Value">{pokemon.weight}</label>
+                </div>
+              }
+                
+                
+            </div>
+
+            <div>
+              <label className="Pokemon-Moves">Moves:</label>
+              {
+                
+                // select just first 4 moves
+                  pokemon.moves.slice(0,4).map(item => (
+                    <div key={uuidv4()}>
+                      <label >{item.move.name}</label>
+                    </div>
+                
               </div>
               <div style={{marginLeft:'-23px', zIndex:1, display:'flex', alignItems:'center'}}>
                 <button onClick={()=> getPokemon(currentId + 1)}>{'>'}</button>
