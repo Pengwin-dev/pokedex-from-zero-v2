@@ -18,7 +18,7 @@ import Button from '@mui/material/Button';
 const drawerWidth = 240;
 const navItems = ['Poke', 'Login', 'Favorites'];
 
-function DrawerAppBar(props) {
+function DrawerAppBar (props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
